@@ -2,17 +2,37 @@
 #include "words.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #define MAX_DATA 16384
 #define MAX_STACK 16384
 #define MAX_RETURN 16384
 
-int main(void)
-{
+int main(int argc, char** argv) {
+    FILE* file;
     struct forth forth = {0};
     forth_init(&forth, stdin, MAX_DATA, MAX_STACK, MAX_RETURN);
     words_add(&forth);
-    forth_run(&forth);
+    if(argc != 1) {
+        for(int i = 1; i < argc; i++){
+            file = fopen(argv[i],"r");
+            if(file) {
+                forth.input = file;
+                forth_run(&forth);
+            }
+            else{
+                if (i == argc - 1 && strcmp(argv[argc - 1], "-") == 0) {
+                    forth.input = stdin;
+                    forth_run(&forth);
+                }
+                printf("Can not read file %s\n", argv[i]);
+                forth_free(&forth);
+                return -1;
+            }
+        }
+    }else{
+        forth_run(&forth);
+    }
     forth_free(&forth);
     return 0;
 }
