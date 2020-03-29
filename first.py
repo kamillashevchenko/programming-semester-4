@@ -1,39 +1,45 @@
 #!/usr/bin/python3
+""" task 27 """
 
-import random
 import copy
 
 def bubblesort(arr):
-    for i in range(len(arr)):
-         for j in range(len(arr)):
-             if arr[i] > arr[j]:
-                 arr[i], arr[j] = arr[j], arr[i]
+    """ bubble sort """
+    for idx, _ in enumerate(arr):
+        for j, _ in enumerate(arr):
+            if arr[idx] > arr[j]:
+                arr[idx], arr[j] = arr[j], arr[idx]
 
 
 def qsort(arr, first, last):
-   if first >= last:
-       return
+    """ quick sort """
+    if first >= last:
+        return
 
-   i, j = first, last
-   pivot = arr[first]
+    idx, j = first, last
+    pivot = arr[first]
 
-   while i <= j:
-       while arr[i] < pivot: i += 1
-       while arr[j] > pivot: j -= 1
-       if i <= j:
-           arr[i], arr[j] = arr[j], arr[i]
-           i, j = i + 1, j - 1
-   qsort(arr, first, j)
-   qsort(arr, i, last)
+    while idx <= j:
+        while arr[idx] < pivot:
+            idx += 1
+        while arr[j] > pivot:
+            j -= 1
+        if idx <= j:
+            arr[idx], arr[j] = arr[j], arr[idx]
+            idx, j = idx + 1, j - 1
+    qsort(arr, first, j)
+    qsort(arr, idx, last)
 
 
 def print_arr(arr):
-    for i, j in enumerate(arr):
-        print(i, j)
+    """ print array """
+    for idx, j in enumerate(arr):
+        print(idx, j)
     print()
 
 
 def main(init_arr):
+    """ main """
     arr = copy.copy(init_arr)
     bubblesort(arr)
     print_arr(arr)
@@ -44,8 +50,8 @@ def main(init_arr):
 
 
 if __name__ == '__main__':
-    numbers = []
-    length = int(input())
-    for i in range(length):
-        numbers.append(int(input()))
-    main(numbers)
+    NUMBERS = []
+    LENGTH = int(input())
+    for k in range(LENGTH):
+        NUMBERS.append(int(input()))
+    main(NUMBERS)
