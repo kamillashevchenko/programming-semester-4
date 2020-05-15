@@ -7,11 +7,45 @@
 
 static void line_comment(struct forth *forth);
 
+void comm(struct forth *forth) {
+    int symbol;
+    while((symbol = fgetc(forth->input)) =='\n'&& symbol > 0);
+}
+
+void push_symbol(struct forth *forth) {
+    int smb;
+    while ((smb = fgetc(forth->input)) == ' ');
+    if (smb > 0) {
+        forth_push(forth, smb);
+    }
+}
+
+void bl_comm(struct forth *forth) {
+    int kol, smb;
+    kol = 0;
+    while ((smb = fgetc(forth->input)) > 0) {
+        if (smb == '(') {
+            kol++;
+        }
+        if (kol == 0 && smb == ')') {
+            break;
+        }
+        if (smb == ')') {
+            kol--;
+        }
+    }
+}
+
 void words_add(struct forth *forth)
 {
     int status = 0;
     static const char* square[] = { "dup", "*", "exit", 0 };
 
+    forth_add_codeword(forth, "key", push_symbol);
+    forth_add_codeword(forth, "\\", comm);
+    forth->latest->immediate = true;
+    forth_add_codeword(forth, "(", bl_comm);
+    forth->latest->immediate = true;
     forth_add_codeword(forth, "interpret", interpreter_stub);
     forth->stopword = forth->latest;
     forth->executing = &forth->stopword;

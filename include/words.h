@@ -2,6 +2,9 @@
 
 #include "forth.h"
 
+void push_symbol(struct forth *forth);
+void bl_comm(struct forth *forth);
+void comm(struct forth *forth);
 void words_add(struct forth *forth);
 
 void drop(struct forth *forth);
