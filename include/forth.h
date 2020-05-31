@@ -10,6 +10,7 @@ typedef intptr_t cell;
 #define MAX_WORD 32
 
 struct word {
+    int kol;
     struct word *next;
     bool compiled;
     bool hidden;
@@ -19,6 +20,7 @@ struct word {
 };
 
 struct forth {
+    int count;
     struct word **executing;
     cell *sp;
     cell *rp;
