@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <time.h>
 
 struct forth;
 typedef intptr_t cell;
@@ -10,6 +11,7 @@ typedef intptr_t cell;
 #define MAX_WORD 32
 
 struct word {
+    clock_t time;
     struct word *next;
     bool compiled;
     bool hidden;
@@ -19,6 +21,7 @@ struct word {
 };
 
 struct forth {
+    int count;
     struct word **executing;
     cell *sp;
     cell *rp;

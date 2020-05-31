@@ -1,7 +1,9 @@
 #pragma once
 
 #include "forth.h"
-
+int compare(const void* a, const void* b);
+void t(struct forth *forth);
+void times(struct forth *forth);
 void words_add(struct forth *forth);
 
 void drop(struct forth *forth);

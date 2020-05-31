@@ -5,13 +5,17 @@
 
 #include "words.h"
 
-static void line_comment(struct forth *forth);
+struct ntime {
+    char name[MAX_WORD + 1];
+    clock_t time;
+};
 
 void words_add(struct forth *forth)
 {
     int status = 0;
     static const char* square[] = { "dup", "*", "exit", 0 };
-
+    forth_add_codeword(forth, "t", t);
+    forth_add_codeword(forth, "times", times);
     forth_add_codeword(forth, "interpret", interpreter_stub);
     forth->stopword = forth->latest;
     forth->executing = &forth->stopword;
@@ -61,10 +65,49 @@ void words_add(struct forth *forth)
     forth_add_codeword(forth, "find", find);
     forth_add_codeword(forth, ",", comma);
     forth_add_codeword(forth, "next", next);
-    forth_add_codeword(forth, "\\", line_comment);
 
     status = forth_add_compileword(forth, "square", square);
     assert(!status);
+}
+
+void t(struct forth *forth) {
+    size_t length;
+    char word_buffer[MAX_WORD+1] = {0};
+
+    if((read_word(forth->input, sizeof(word_buffer), word_buffer, &length)) == FORTH_OK) {
+        const struct word* word = word_find(forth->latest, length, word_buffer);
+        if(word) {
+            printf("%s\t%lf\n", word->name, (double)word->time/ CLOCKS_PER_SEC);
+            return;
+        }
+    }
+    printf("Error: Unknown word\n");
+}
+
+void times(struct forth *forth) {
+    struct word* index = forth->latest;
+    struct ntime* sort = (struct ntime*)malloc((forth->count)*(sizeof(struct ntime)));
+    int i, j;
+    i = 0;
+
+    printf("\n");
+    while (index) {
+        memcpy(sort[i].name, index->name, index->length);
+        (sort[i].name)[index->length] = 0;
+        sort[i].time = index->time;
+        i++;
+        index = index->next;
+    }
+
+    qsort(sort,(forth->count), sizeof(struct ntime), compare);
+    for (j = 0; j < forth->count; j++) {
+        printf("%s\t %lf\n", sort[j].name, (double)(sort[j].time)/CLOCKS_PER_SEC);
+    }
+    free(sort);
+}
+
+int compare(const void* a, const void* b) {
+    return (*(struct ntime*)b).time - (*(struct ntime*)a).time;
 }
 
 void drop(struct forth *forth) {
@@ -349,12 +392,4 @@ void interpreter_stub(struct forth *forth)
     (void)forth;
     printf("ERROR: return stack underflow (must exit to interpreter)\n");
     exit(2);
-}
-
-static void line_comment(struct forth *forth)
-{
-    int c = 0;
-    do {
-        c = fgetc(forth->input);
-    } while (c > 0 && c != '\n');
 }
